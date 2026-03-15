@@ -4,9 +4,22 @@ from core_backend.settings import supabase
 # This will download the free model to your machine the first time it runs
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-def chunk_text(text, chunk_size=500):
-    """Breaks large scraped text into smaller chunks for the AI to read."""
-    return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+def chunk_text(text, chunk_words=200, overlap=40):
+    """
+    Breaks text into chunks by words instead of characters.
+    Includes an overlap so context isn't lost at the boundaries.
+    """
+    words = text.split()
+    chunks = []
+    
+    # Step through the text, going back 'overlap' steps each time
+    for i in range(0, len(words), chunk_words - overlap):
+        # Join the next 200 words into a single string
+        chunk = " ".join(words[i : i + chunk_words])
+        if chunk:
+            chunks.append(chunk)
+            
+    return chunks
 
 def process_and_store_documents(scraped_data):
     """Embeds text in native batches and pushes to Supabase."""
