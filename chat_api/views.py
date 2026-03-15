@@ -18,7 +18,8 @@ class IngestURLView(APIView):
         try:
             # 1. Scrape the website (limit depth to 1 for hackathon speed)
             print(f"Starting scrape for: {url}")
-            scraped_data = scrape_url(url, max_depth=1)
+            # Updated to use max_pages for our new multi-threaded scraper
+            scraped_data = scrape_url(url, max_pages=20)
             
             if not scraped_data:
                 return Response({"error": "No content scraped. Check URL."}, status=status.HTTP_400_BAD_REQUEST)
@@ -86,5 +87,5 @@ class ChatQueryView(APIView):
             return Response({"answer": final_answer}, status=status.HTTP_200_OK)
             
         except Exception as e:
-            print(f"CRITICAL CHAT ERROR: {str(e)}")
+            print(f"CRITICAL INGEST ERROR: {str(e)}") 
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
